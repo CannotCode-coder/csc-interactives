@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Programming language landscape</title>
+<style>
+  /* ---- Tokens: edit these to restyle everything ---- */
+  :root {
+    --ink:    #1f2421;
+    --muted:  #5f5e5a;
+    --line:   #e2e0d8;
+    --surface:#ffffff;
+    --soft:   #faf9f5;
+    /* "covered in depth" = teal */
+    --deep-bg:#e1f5ee; --deep-br:#1d9e75; --deep-ink:#0f6e56;
+    /* "mentioned briefly" = grey */
+    --brief-bg:#f1efe8; --brief-br:#b4b2a9; --brief-ink:#5f5e5a;
+    --focus:  #185fa5;
+    --radius: 10px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink:#e8e6df; --muted:#a8a69e; --line:#3a3a37;
+      --surface:#1e1e1c; --soft:#262623;
+      --deep-bg:#0f3d33; --deep-br:#1d9e75; --deep-ink:#9fe1cb;
+      --brief-bg:#2c2c2a; --brief-br:#5f5e5a; --brief-ink:#d3d1c7;
+      --focus:#85b7eb;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: var(--font);
+    color: var(--ink);
+    line-height: 1.6;
+    background: transparent;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 16px; }
+
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 16px;
+    font-size: 13px; color: var(--muted); margin: 0 0 14px;
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 13px; height: 13px; border-radius: 3px; border: 1px solid; }
+  .sw-deep  { background: var(--deep-bg);  border-color: var(--deep-br); }
+  .sw-brief { background: var(--brief-bg); border-color: var(--brief-br); }
+
+  .lane {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 10px 12px; margin-bottom: 8px;
+    border: 1px solid var(--line); border-radius: var(--radius);
+    background: var(--soft);
+  }
+  .lane-label { flex: 0 0 130px; }
+  .lane-label .name { font-weight: 500; font-size: 14px; }
+  .lane-label .note { font-size: 12px; color: var(--muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; flex: 1; }
+
+  .chip {
+    font-family: inherit; font-size: 14px; cursor: pointer;
+    border-radius: 999px; padding: 5px 13px;
+    border: 1px solid; background: transparent;
+    transition: transform .08s ease;
+  }
+  @media (prefers-reduced-motion: reduce) { .chip { transition: none; } }
+  .chip.deep  { background: var(--deep-bg);  border-color: var(--deep-br);  color: var(--deep-ink); }
+  .chip.brief { background: var(--brief-bg); border-color: var(--brief-br); color: var(--brief-ink); }
+  .chip:hover { transform: translateY(-1px); }
+  .chip:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .chip.active { box-shadow: 0 0 0 2px var(--focus); }
+
+  .detail {
+    margin-top: 14px; padding: 14px 16px;
+    border: 1px solid var(--line); border-radius: var(--radius);
+    background: var(--surface); min-height: 92px;
+  }
+  .detail .d-name { font-size: 16px; font-weight: 500; margin: 0 0 2px; }
+  .detail .d-tag  { font-size: 12px; color: var(--muted); margin: 0 0 8px; }
+  .detail .d-row  { font-size: 14px; margin: 4px 0; }
+  .detail .d-key  { color: var(--muted); }
+  .detail .d-hint { color: var(--muted); font-style: italic; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="legend" aria-hidden="true">
+    <span><span class="swatch sw-deep"></span> covered in depth</span>
+    <span><span class="swatch sw-brief"></span> mentioned briefly</span>
+  </div>
+
+  <div id="lanes"></div>
+
+  <div class="detail" id="detail" role="status" aria-live="polite">
+    <p class="d-hint" id="detail-body">Hover, tap, or select a language to see what it is for.</p>
+  </div>
+
+</div>
+
+<script>
+/* ---- Data: add a language by adding one entry + listing its id in a domain ---- */
+const LANGS = {
+  python:     { name:"Python",     depth:"deep",  use:"Science, data, machine learning, and teaching.", take:"Clean and easy to read. Quick to write, but slow to run. A good first language." },
+  javascript: { name:"JavaScript", depth:"deep",  use:"The web. It runs in every browser.",             take:"It is used almost everywhere on the web. It became popular very fast." },
+  php:        { name:"PHP",        depth:"deep",  use:"Web pages, built on the server.",                 take:"An older web language. Still common, but JavaScript now competes with it." },
+  java:       { name:"Java",       depth:"deep",  use:"Large business systems.",                         take:"It checks for many errors before it runs. Powerful, but uses a lot of code. Its growth has slowed." },
+  c:          { name:"C",          depth:"deep",  use:"Operating systems and core libraries.",           take:"Very fast and close to the hardware. Python and Java are built on top of C. It can cause memory bugs." },
+  cpp:        { name:"C++",        depth:"brief", use:"Systems, games, and fast software.",              take:"Like C, but with more features and more complexity." },
+  rust:       { name:"Rust",       depth:"brief", use:"Systems programming.",                            take:"Fast like C, but safer with memory. Powerful, but hard to learn." },
+  go:         { name:"Go",         depth:"brief", use:"Systems and servers.",                            take:"Similar aims to Rust, but simpler. Made by Google." },
+  csharp:     { name:"C#",         depth:"brief", use:"Business and desktop software.",                  take:"Similar to Java. Made by Microsoft." },
+  r:          { name:"R",          depth:"brief", use:"Statistics and data analysis.",                   take:"Excellent for statistics. Less useful for other tasks." },
+  clojure:    { name:"Clojure",    depth:"brief", use:"Data work. Runs on the Java platform.",           take:"A flexible language, often used for data." },
+  swift:      { name:"Swift",      depth:"brief", use:"Apps for Apple devices.",                         take:"Apple's language for iPhone and Mac apps." },
+  kotlin:     { name:"Kotlin",     depth:"brief", use:"Android apps.",                                   take:"Common for Android. Runs on the Java platform." }
+};
+
+const DOMAINS = [
+  { name:"Systems",        note:"close to the hardware", langs:["c","cpp","rust","go"] },
+  { name:"Web",            note:"",                       langs:["javascript","php"] },
+  { name:"Enterprise",     note:"large business systems", langs:["java","csharp"] },
+  { name:"Science & data", note:"",                       langs:["python","r","clojure"] },
+  { name:"Mobile apps",    note:"",                       langs:["swift","kotlin"] }
+];
+
+const lanesEl  = document.getElementById("lanes");
+const detailEl = document.getElementById("detail");
+let activeBtn  = null;
+
+function show(id) {
+  const L = LANGS[id];
+  if (!L) return;
+  detailEl.innerHTML =
+    '<p class="d-name">' + L.name + '</p>' +
+    '<p class="d-tag">' + (L.depth === "deep" ? "Covered in depth" : "Mentioned briefly") + '</p>' +
+    '<p class="d-row"><span class="d-key">Used for: </span>' + L.use + '</p>' +
+    '<p class="d-row"><span class="d-key">In short: </span>' + L.take + '</p>';
+}
+
+DOMAINS.forEach(function (d) {
+  const lane = document.createElement("div");
+  lane.className = "lane";
+
+  const label = document.createElement("div");
+  label.className = "lane-label";
+  label.innerHTML = '<div class="name">' + d.name + '</div>' +
+                    (d.note ? '<div class="note">' + d.note + '</div>' : '');
+  lane.appendChild(label);
+
+  const chips = document.createElement("div");
+  chips.className = "chips";
+  d.langs.forEach(function (id) {
+    const L = LANGS[id];
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip " + (L.depth === "deep" ? "deep" : "brief");
+    b.textContent = L.name;
+    b.setAttribute("aria-label", L.name + ", " + L.use);
+
+    function select() {
+      if (activeBtn) activeBtn.classList.remove("active");
+      b.classList.add("active");
+      activeBtn = b;
+      show(id);
+    }
+    b.addEventListener("mouseenter", select);
+    b.addEventListener("focus", select);
+    b.addEventListener("click", select);
+
+    chips.appendChild(b);
+  });
+  lane.appendChild(chips);
+  lanesEl.appendChild(lane);
+});
+</script>
+</body>
+</html>
