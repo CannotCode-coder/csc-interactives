@@ -104,19 +104,71 @@
 <script>
 /* ---- Data: add a language by adding one entry + listing its id in a domain ---- */
 const LANGS = {
-  python:     { name:"Python",     depth:"deep",  use:"Science, data, machine learning, and teaching.", take:"Clean and easy to read. Quick to write, but slow to run. A good first language." },
-  javascript: { name:"JavaScript", depth:"deep",  use:"The web. It runs in every browser.",             take:"It is used almost everywhere on the web. It became popular very fast." },
-  php:        { name:"PHP",        depth:"deep",  use:"Web pages, built on the server.",                 take:"An older web language. Still common, but JavaScript now competes with it." },
-  java:       { name:"Java",       depth:"deep",  use:"Large business systems.",                         take:"It checks for many errors before it runs. Powerful, but uses a lot of code. Its growth has slowed." },
-  c:          { name:"C",          depth:"deep",  use:"Operating systems and core libraries.",           take:"Very fast and close to the hardware. Python and Java are built on top of C. It can cause memory bugs." },
-  cpp:        { name:"C++",        depth:"brief", use:"Systems, games, and fast software.",              take:"Like C, but with more features and more complexity." },
-  rust:       { name:"Rust",       depth:"brief", use:"Systems programming.",                            take:"Fast like C, but safer with memory. Powerful, but hard to learn." },
-  go:         { name:"Go",         depth:"brief", use:"Systems and servers.",                            take:"Similar aims to Rust, but simpler. Made by Google." },
-  csharp:     { name:"C#",         depth:"brief", use:"Business and desktop software.",                  take:"Similar to Java. Made by Microsoft." },
-  r:          { name:"R",          depth:"brief", use:"Statistics and data analysis.",                   take:"Excellent for statistics. Less useful for other tasks." },
-  clojure:    { name:"Clojure",    depth:"brief", use:"Data work. Runs on the Java platform.",           take:"A flexible language, often used for data." },
-  swift:      { name:"Swift",      depth:"brief", use:"Apps for Apple devices.",                         take:"Apple's language for iPhone and Mac apps." },
-  kotlin:     { name:"Kotlin",     depth:"brief", use:"Android apps.",                                   take:"Common for Android. Runs on the Java platform." }
+  python: {
+    name:"Python", depth:"deep",
+    use:"Science, data, machine learning, and teaching.",
+    take:"Python has a very clean look, so the code is easy to read. This helped it replace Perl, an older and messier language. Libraries like NumPy and Pandas then pushed it into science, data, and machine learning. It is quick to write, but slow to run. It is easy to learn, yet it is not only a \u2018teaching language\u2019 \u2014 once you know it, you have a proper tool for real work. Its weak points are the web and mobile, and it uses meaningful whitespace, which I am not fond of."
+  },
+  javascript: {
+    name:"JavaScript", depth:"deep",
+    use:"The web. It runs in every browser. Also data visualisation.",
+    take:"JavaScript is barely related to Java \u2014 it only shares part of the name and a similar C-style syntax. It was first made to change web pages, and is now the main language of the web, and of visualisation of all kinds. Many other languages compile down to JavaScript so they can run in the browser. A newer technology called WASM now challenges it. I find its huge success a bit of a mystery \u2014 it seems to have arrived in the right place at the right time."
+  },
+  php: {
+    name:"PHP", depth:"deep",
+    use:"Web pages, built on the server.",
+    take:"PHP is an utterly bizarre templating language for HTML. It can do more than that, but for no clear reason it became the language of choice for the web for many years. These days JavaScript is challenging it heavily on the server side."
+  },
+  java: {
+    name:"Java", depth:"deep",
+    use:"Large business systems.",
+    take:"Java was first designed for set-top boxes, then moved to the web. It runs inside the Java Virtual Machine (JVM), a safe, sealed environment. It is strongly typed, so it catches more errors than Python before the code runs. It is slow to build and slow to run, and very wordy \u2014 Java programmers\u2019 love of patterns is often taken to extremes. It is still everywhere, mostly in high-end business systems, but its progress stalled after Oracle bought it. I programmed in Java for years and admit I no longer like it. The JVM itself, though, is an amazing piece of software."
+  },
+  c: {
+    name:"C", depth:"deep",
+    use:"Operating systems and core libraries.",
+    take:"C was built to run, and to run fast. In a sense, everything is built on C \u2014 both Python and the JVM are written in it. Once a \u2018high-level\u2019 language, it is now one of the lowest-level languages in common use. It runs operating systems, command-line tools, and scientific libraries. It is not memory safe, and a very large number of critical bugs come from this. Newer languages now challenge it, each promising some form of memory safety. Its syntax has been so influential that both Java and Python borrow from it."
+  },
+  cpp: {
+    name:"C++", depth:"brief",
+    use:"Systems, games, and fast software.",
+    take:"Like C, but with much more complexity added \u2014 to achieve, well, something."
+  },
+  rust: {
+    name:"Rust", depth:"brief",
+    use:"Systems programming.",
+    take:"Systems programming: very fast, and a real challenger to C. But quite complicated."
+  },
+  go: {
+    name:"Go", depth:"brief",
+    use:"Systems and servers.",
+    take:"The same focus as Rust, and less complicated \u2014 but it is controlled by Google."
+  },
+  csharp: {
+    name:"C#", depth:"brief",
+    use:"Business and desktop software.",
+    take:"Pronounced \u2018C-sharp\u2019. Like Java in most ways, but controlled by Microsoft."
+  },
+  r: {
+    name:"R", depth:"brief",
+    use:"Statistics and data analysis.",
+    take:"Written by statisticians. Fantastic for doing stats, and truly awful in every other way."
+  },
+  clojure: {
+    name:"Clojure", depth:"brief",
+    use:"Data work. Runs on the Java platform.",
+    take:"General purpose, often used for data manipulation. It targets the JVM."
+  },
+  swift: {
+    name:"Swift", depth:"brief",
+    use:"Apps for Apple devices.",
+    take:"App programming, for Apple devices."
+  },
+  kotlin: {
+    name:"Kotlin", depth:"brief",
+    use:"Android apps.",
+    take:"General purpose, but most common on Android. It targets the JVM."
+  }
 };
 
 const DOMAINS = [
